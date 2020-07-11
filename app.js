@@ -20,12 +20,22 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.post('/dictionary', (req, res) => {
-  let search = req.body.search;
-  connection.query("SELECT * FROM amazontoeic WHERE Entry LIKE '"+ search + "%';", function (error, results, fields) {
-    if (error) throw error;
-    console.log(results);
-    res.status(200).send(results).end();
-  });
+  let search = '' + req.body.search;
+  if (search.length > 1 && search != "undefined") {
+    connection.query("SELECT * FROM amazontoeic WHERE Entry LIKE '"+ search + "%';", function (error, results, fields) {
+      if (error) throw error;
+      console.log(results);
+      res.status(200).send(results).end();
+    });
+  } else {
+    res.status(200)
+      .send({
+        'status': 'Fail',
+        'error_code': 'MISSING_PARAMETER',
+        'message': 'Please Input a search keyword'
+      })
+      .end();
+  }
 });
 
 app.get('/', (req, res) => {
